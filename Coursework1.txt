@@ -1,0 +1,12 @@
+Problem 1
+
+SELECT Party.name FROM Party;
+
+Problem 2
+select sum(Candidate.votes) from Candidate;
+or
+select sum(Candidate.votes) as SumOfVotes from Candidate;
+
+Problem 3
+//improvised this myself
+select name,votes from Candidate where Candidate.ward = (select id from Ward where name = 'Bedminster');
