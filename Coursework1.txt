@@ -1,3 +1,13 @@
+
+i should check these work with 2015 too, and cross reference the answers with otto. either by writing them down or doing it in person. 
+
+candidate = id, name, party, ward, votes
+
+Party = id, name
+
+ward = id, name, electorate
+
+
 Problem 1
 
 SELECT Party.name FROM Party;
@@ -10,3 +20,69 @@ select sum(Candidate.votes) as SumOfVotes from Candidate;
 Problem 3
 //improvised this myself
 select name,votes from Candidate where Candidate.ward = (select id from Ward where name = 'Bedminster');
+
+
+Problem 4
+
+how many votes, lib dems (party number) in filwood (ward number)
+
+select sum(Candidate.votes) from Candidate where Candidate.ward = (select id from Ward where name = 'Filwood') and Candidate.party = (select id from Party where name = 'Liberal Democrat');
+
+Problem 5
+Produce a table with three columns called name, party, votes showing the
+results for the Hengrove ward, ordered by number of votes (highest first).
+The 2014 solution is:
+
+select Candidate.name, Party.name, Candidate.votes from Candidate, Party where Candidate.party = Party.id and Candidate.ward = (select id from Ward where name = 'Hengrove') order by votes desc;
+
+Problem 6
+Which rank (1 st , 2 nd , 3 rd ...) did Labour end up in Bishopsworth?
+Your solution should be a table with one row and one column containing the answer
+as a number. Hint: count the number of parties that got the same number or more
+votes than Labour. You may assume no ties.
+The 2014 solution is 2 (Labour came second).
+
+select count(votes) from Candidate where votes >= (select votes from Candidate where Candidate.party = (select id from Party where name = 'Labour') and Candidate.ward = (select id from Ward where name = 'Bishopsworth')) and Candidate.ward = (select id from Ward where name = 'Bishopsworth');
+
+
+7. How successful (in % of votes cast) was the Green party in each ward?
+You do not need to sort the results. The 2014 solution is (one row per ward):
+
+Avonmouth 4.3772
+Bedminster 22.4605
+...         ...
+Windmill Hill 24.0964
+
+first just print name of ward and number of votes for green party 
+
+select Ward.name, Candidate.votes 
+
+select id, name, party, ward, votes from Candidate where Candidate.party = (select id from Party where Party.name = 'Green');
+
+get all wards and their votes for green party. 
+
+select Ward.name, Candidate.votes from Ward, Candidate where Ward.id = Candidate.ward and Candidate.party = (select id from Party where Party.name = 'Green');
+
+
+make new column - votes/ that ward total votes. 
+
+divide by (select sum(votes) from Candidate where Ward.id = (that specific ward id)
+
+
+select Ward.name, Candidate.votes from Ward, Candidate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
