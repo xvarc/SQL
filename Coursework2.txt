@@ -1,0 +1,36 @@
+id name
+1Managers, directors and senior officials
+2Professional occupations
+3Associate professional and technical occupations
+4Administrative and secretarial occupations
+5Skilled trades occupations
+6Caring, leisure and other service occupations
+7Sales and customer service occupations
+8Process, plant and machine operatives
+9 Elementary occupations
+
+
+CREATE TABLE Statistic (
+	wardId VARCHAR(10),
+	occId INTEGER,
+	gender INTEGER, -- 1 = female, 0 = male
+	data INTEGER,
+	PRIMARY KEY (wardId, occId, gender),
+	FOREIGN KEY (wardId) REFERENCES Ward(code),
+	FOREIGN KEY (occId) REFERENCES Occupation(id)
+);
+
+
+question 1; 
+SELECT data FROM Statistic WHERE wardId = 'E05001975'
+AND occId = 7 AND gender = 1;
+
+question 1; 
+SELECT data FROM Statistic WHERE wardId = 'E05000697'
+AND occId = 5;
+
+
+
+
+
+

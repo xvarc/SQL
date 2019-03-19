@@ -57,6 +57,8 @@ first just print name of ward and number of votes for green party
 
 select Ward.name, Candidate.votes 
 
+the one below is the working one i think:
+
 select id, name, party, ward, votes from Candidate where Candidate.party = (select id from Party where Party.name = 'Green');
 
 get all wards and their votes for green party. 
@@ -68,10 +70,12 @@ make new column - votes/ that ward total votes.
 
 divide by (select sum(votes) from Candidate where Ward.id = (that specific ward id)
 
-
 select Ward.name, Candidate.votes from Ward, Candidate;
 
 
+will this do the respective total for each line? 
+
+select sum(votes) from Candidate where Candidate.ward = (select id from Ward where Ward.id = Candidate.ward); 
 
 
 
