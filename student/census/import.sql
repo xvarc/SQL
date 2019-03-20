@@ -1,0 +1,9 @@
+-- import script for census data.
+-- To recreate the census data, source this file in mariadb.
+
+LOAD DATA INFILE 'Country.csv'    INTO TABLE Country    FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n';
+LOAD DATA INFILE 'Region.csv'     INTO TABLE Region     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n';
+LOAD DATA INFILE 'County.csv'     INTO TABLE County     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n';
+LOAD DATA INFILE 'Ward.csv'       INTO TABLE Ward       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n' (code, name, @parent) SET parent=nullif(@parent,'');
+LOAD DATA INFILE 'Occupation.csv' INTO TABLE Occupation FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n';
+LOAD DATA INFILE 'Statistic.csv'  INTO TABLE Statistic  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n';

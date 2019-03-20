@@ -1,5 +1,5 @@
 
-i should check these work with 2015 too, and cross reference the answers with otto. either by writing them down or doing it in person. 
+i should check these work with 2015 too, and cross reference the answers with otto. either by writing them down or doing it in person.
 
 candidate = id, name, party, ward, votes
 
@@ -53,75 +53,38 @@ Bedminster 22.4605
 ...         ...
 Windmill Hill 24.0964
 
-first just print name of ward and number of votes for green party 
 
-select Ward.name, Candidate.votes 
+select (select name from Ward where id=A.ward), (A.votes/B.sum*100) as percent
 
-the one below is the working one i think:
+FROM
 
-select id, name, party, ward, votes from Candidate where Candidate.party = (select id from Party where Party.name = 'Green');
+(select ward, sum(votes) as votes
 
-get all wards and their votes for green party. 
+from Candidate
 
-select Ward.name, Candidate.votes from Ward, Candidate where Ward.id = Candidate.ward and Candidate.party = (select id from Party where Party.name = 'Green');
-
-
-make new column - votes/ that ward total votes. 
-
-divide by (select sum(votes) from Candidate where Ward.id = (that specific ward id)
-
-select Ward.name, Candidate.votes from Ward, Candidate;
-
-
-will this do the respective total for each line? 
-
-select sum(votes) from Candidate where Candidate.ward = (select id from Ward where Ward.id = Candidate.ward); 
-
-
-
-
-
-
-
-Candidate.party = (select id from Party where Party.name = 'Green');
-
-
-
-select name, votes/sum*100
-
-
-
-select (select name from Ward where id=A.ward), (A.votes/B.sum*100) as percent 
-
-FROM 
-
-(select ward, sum(votes) as votes 
-
-from Candidate 
-
-where party in (select id from Party where Party.name = 'Green') 
+where party in (select id from Party where Party.name = 'Green')
 
 group by ward)
 
-as A 
+as A
 
 
 
-inner join 
+inner join
 
-(select ward, sum(votes) as sum 
+(select ward, sum(votes) as sum
 
-from Candidate group by ward) 
+from Candidate group by ward)
 
-as B 
+as B
 
 on A.ward = B.ward;
 
 
 
-inner join 
+inner join
 
-select name, id 
+select name, id
 
 from Ward
 
@@ -129,12 +92,50 @@ as C;
 
 
 
+/* 8.
+Find all the wards where the Greens beat Labour and create a table with
+columns ward,rel,abs where name is the ward name, rel is the relative
+difference as a percentage of the electorate in the relevant ward and abs is the
+absolute difference in votes between the Greens and Labour in this ward.
+
+The 2014 solution is:
+
+ward        rel     abs
+Bishopston    10.4630 1078
+Redland        8.9236 776
+Southville    3.8949 378
+Stoke Bishop   0.5564 45
+*/
 
 
+select (select name from Ward where id = A.ward) as ward,
+  (A.total-B.total) * 100 / (select electorate from Ward where id = A.ward) as rel,
+   A.total-B.total as abs
 
+From
 
-1. SELECT column-names
-2.   FROM table-name1 inner JOIN table-name2 
-3. ​    ON column-name1 = column-name2
+(select ward, sum(votes) as total
 
+from Candidate
 
+where party in (select id from Party where Party.name = 'Green')
+
+group by ward)
+
+as A
+
+inner join
+
+(select ward, sum(votes) as total
+
+from Candidate
+
+where party in (select id from Party where Party.name = 'Labour')
+
+group by ward)
+
+as B
+
+on A.ward = B.ward
+
+where A.total > B.total;
