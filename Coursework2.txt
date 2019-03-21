@@ -21,16 +21,123 @@ CREATE TABLE Statistic (
 );
 
 
-question 1; 
+question 1;
 SELECT data FROM Statistic WHERE wardId = 'E05001975'
 AND occId = 7 AND gender = 1;
 
-question 1; 
-SELECT data FROM Statistic WHERE wardId = 'E05000697'
+question 2;
+SELECT sum(data) FROM Statistic WHERE wardId = 'E05000697'
 AND occId = 5;
 
+3. For the residents of Portland ward (E05008884), list how many people worked in each
+class of occupation as a table with two columns num_people,occ_class. The
+second column should contain the name (i.e. “Managers . . . ”) of the occupation class.
+
+SELECT sum(data) as num_people,  name as occ_class FROM Occupation, Statistic WHERE Occupation.id = Statistic.occId and wardId = 'E05008884' group by occId;
+
+4. Find the working population, code, ward name and county-level unit name (entry in
+the county table) of the smallest ward by working population in the dataset. Hint: sort
+on size and then take the first row to get the minimum.
+
+// breaks it
+
+
+-- the below does not work - after i tried to put county into it.
+select
+
+(select name from county) as county,
+
+(select name from ward where ward.code = statistic.wardId) as place,
+
+wardId,
+
+sum(data) as total
+
+from Statistic, Ward group by wardId order by total asc limit 1;
+
+-- the below works but has no county
+select
+(select name
+	from ward
+	where ward.code = statistic.wardId) as place,
+	wardId,
+	sum(data) as total
+from Statistic group by wardId order by total asc limit 1;
+
+
+5. How many wards have at least 1000 working inhabitants?
+
+-- first i need to aggregate all genders and professions. this could be done by grouping by first, instead of doing the where first.
+
+select sum(data) from Statistic where data>1000 group by wardId;
+
+
+--both the below work
+select count(*) from (select sum(data) as dsum from Statistic group by wardId) as T where dsum>1000;
+
+select count(*) from (select sum(data) from Statistic group by wardId having sum(data)>1000) as T;
 
 
 
+select count(data) from Statistic where data>1000 group by wardId;
+
+select count(data) from Statistic where data>1000 group by wardId; -- this counts how many wards are in each grouping. this is because of the relationship between count and group by.
+
+6. Find the average size of a ward’s working population for each region
+ of England. Your output should contain two columns called name,avg_size.
+Hint: this one would be easy if you could use two queries and a temporary
+ table. To do it in one query, use an inline view.
+
+select region.name, avg(Statistic.data) as avg_size
+from region, county, ward, Statistic
+where region.code = county.parent
+and county.code = ward.parent
+and ward.code = statistic.wardId
+group by region.name
+limit 100;
+
+question 7 -
+For all county-level units (CLUs) in the North West region (E12000002),
+produce a table in the following format
+
+CLU occupation gender N
+Cumbria 				Associate professional …		 female 10054
+Lancashire 			Caring leisure …						 male 10088
+Cheshire West … Sales and customer …				 female 10107
+Cheshire East		 Associate professional … 	female 10178
+
+with the following conditions:
+
+• “N” is the number of residents of the given occupation class and
+ gender in the given CLU.
+• “gender” is the string ‘male’ or ‘female’.
+• Ignore the “...” in the CLU and occupation columns, just return
+ this from the table directly.
+• The table is sorted by “N” and only values greater or equal
+ to 10000 appear in the table.
+
+select county.name, region.name, sum(Statistic.data) as CLU
+from County, Region, Statistic
+where  county.parent = region.code
+and region.name = 'North West'
+group by county.name
+limit 100;
 
 
+select Occupation.name, Statistic.gender, sum(Statistic.data), region.name
+from Occupation, Statistic, Ward, County, Region
+where Region.name = 'North West'
+and statistic.wardId = Ward.code
+and Ward.parent = County.code
+and County.parent = Region.code
+and Occupation.id = Statistic.occId
+group by Occupation.name
+limit 100;
+
+describe ward;
+describe region;
+describe occupation;
+describe statistic;
+describe county;
+describe country;
+describe region;
